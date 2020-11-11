@@ -4,6 +4,7 @@ include("../database.php");
 $db = new Database();
 $NoReg_Player_id = (isset($_SESSION['NoReg_Player_id'])) ? $_SESSION['NoReg_Player_id'] : "";
 $token = (isset($_SESSION['token'])) ? $_SESSION['token'] : "";
+$Nick_Player = (isset($_SESSION['Nick_Player'])) ? $_SESSION['Nick_Player'] : "";
 
 if($token && $NoReg_Player_id)
 {
@@ -40,25 +41,23 @@ PAGE : LEADERBOARD
        <td><a href="http://localhost/course_batch3ch10/user/">HOME</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/statistik.php">STATISTIK</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/leaderboard.php">LEADERBOARD</a></td>
-       <td><a href="http://localhost/course_batch3ch10/user/InputScore.php">Menambah Score</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/logout.php">LOGOUT</a></td>
    </tr>
 </table>
 <br>
 <form action="http://localhost/course_batch3ch10/user/leaderboard.php" method='GET'>
   Pilih Leaderboard
-  <select name="gameid">
+  <select name="leadid">
     <?php
-    $gamedata = $db->get("SELECT game_tbl.Game_id, game_tbl.Game_name, game_level_tipe_tbl.Nama_Level, game_level_time_tbl.Lama_Time FROM game_tbl, game_level_tipe_tbl, game_level_time_tbl WHERE game_level_tipe_tbl.Level_Tipe_id = game_tbl.Level_Tipe_id AND game_level_time_tbl.Level_Time_id = game_tbl.Level_Time_id AND game_tbl.status = 1");
+    $gamedata = $db->get("SELECT Game_id,Tipe_leaderboard FROM game_tbl WHERE status = 1");
 
     while($row = mysqli_fetch_assoc($gamedata))
     {
       ?>
       <option value="<?php echo $row['Game_id']?>">
         <?php 
-        echo $row['Game_name'];echo ", "; 
-        echo $row['Nama_Level'];echo ", "; 
-        echo $row['Lama_Time'];echo "s";?></option>
+        echo $row['Tipe_leaderboard']; 
+        ?></option>
       <?php
     }
     ?>
@@ -66,9 +65,9 @@ PAGE : LEADERBOARD
   <input type="submit" value="Tampilkan leaderboard">  
 </form>
 <?php
-if(isset($_GET['gameid']))
+if(isset($_GET['leadid']))
 {
-  echo "LEADERBOARD GAME ID: ".$_GET['gameid'];
+  echo "LEADERBOARD GAME ID: ".$_GET['leadid'];
   ?>
   <table border=1>
     <tr><td>NO</td><td>Nickname</td><td>SCORE</td></tr>
@@ -77,7 +76,7 @@ if(isset($_GET['gameid']))
       max(user_game_data_tbl.Score) as score 
       FROM user_tbl, user_game_data_tbl 
       WHERE user_tbl.NoReg_Player_id = user_game_data_tbl.NoReg_Player_id 
-      AND user_game_data_tbl.game_id = ".$_GET['gameid']."
+      AND user_game_data_tbl.game_id = ".$_GET['leadid']."
       GROUP BY user_tbl.NoReg_Player_id ORDER BY score DESC");
     $no = 0;
     while($row = mysqli_fetch_assoc($leaderboarddata))
@@ -93,13 +92,37 @@ if(isset($_GET['gameid']))
     }
     ?>
   </table>
-  <form action="InputScore.php" method="POST">
+  
+<form action="http://localhost/course_batch3ch10/user/InputScore.php" method="POST">
+  <table border=1>
+    Pilih Game
+  <select name="gameid">
+    <?php
+    $gamedata = $db->get("SELECT game_tbl.Game_id, game_tbl.Game_name, game_level_tipe_tbl.Nama_Level, game_level_time_tbl.Lama_Time FROM game_tbl, game_level_tipe_tbl, game_level_time_tbl WHERE game_level_tipe_tbl.Level_Tipe_id = game_tbl.Level_Tipe_id AND game_level_time_tbl.Level_Time_id = game_tbl.Level_Time_id AND game_tbl.status = 1");
+
+    $no=0;
+    while($row = mysqli_fetch_assoc($gamedata))
+    {
+      ?>
+      <option value="<?php echo $row['Game_id']?>">
+        <?php
+        $no++;
+        echo $no;echo ". ";
+        echo $row['Game_name'];echo ", "; 
+        echo $row['Nama_Level'];echo ", "; 
+        echo $row['Lama_Time'];echo "s";?></option>
+      <?php
+    }
+    ?>
+  </select>
     <tr>
-      <td>Masukan Score Baru</td>
-      <td><input type="text" name="score"></td>
-      <td><input type="submit" value="Submit"></td>
+      <td>Tambah Score pada Leaderboard ini</td>
+      <td><input type="number" name="score"></td>
+      <td><input type="submit" value="ADD"></td>
+      <td><input type="hidden" name="output" value="0"/></td>
     </tr>
-    </form>
+  </table>
+</form>
   <?php
 }
 ?>

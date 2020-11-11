@@ -43,7 +43,6 @@ PAGE : STATISTIK
        <td><a href="http://localhost/course_batch3ch10/user/">HOME</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/statistik.php">STATISTIK</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/leaderboard.php">LEADERBOARD</a></td>
-       <td><a href="http://localhost/course_batch3ch10/user/InputScore.php">Menambah Score</a></td>
        <td><a href="http://localhost/course_batch3ch10/user/logout.php">LOGOUT</a></td>
    </tr>
 </table>
